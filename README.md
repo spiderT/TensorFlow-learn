@@ -28,7 +28,7 @@ pip install --upgrade tensorflow
 
 ## 2. TensorFlow基础概念解析
 
-### 2.1. TensorFlow模块与架构介绍
+### 2.1. TensorFlow模块与架构介绍
 
 TensorFlow 模块与 APIs  
 ![模块](images/ts1.png)  
@@ -36,25 +36,25 @@ TensorFlow 模块与 APIs
 TensorFlow 架构  
 ![架构](images/ts2.png)  
 
-### 2.2. TensorFlow数据流图介绍
+### 2.2. TensorFlow数据流图介绍
 
 TensorFlow数据流图是一种声明式编程范式  
 
 ![数据流图](images/ts3.png)  
-![数据流图](images/ts4.png)  
-
-TensorFlow数据流图优势：  
+![数据流图](images/ts4.png)
+
+TensorFlow数据流图优势：  
 
 - 并行计算快
 - 分布式计算快(CPUs, GPUs TPUs)
 - 预编译优化(XLA)
 - 可移植性好(Language-independent representation)
 
-### 2.3. 张量Tensor
+### 2.3. 张量Tensor
 
 在数学里，张量是一种几何实体，广义上表示任意形式的“数据”，张量可以理解为0阶标量，1阶向量和2阶矩阵在高维空间上的推广，张量的阶描述它表示数据的最大维度。
 
-![张量Tensor](images/ts5.png)  
+![张量Tensor](images/ts5.png)
 
 tf.Tensor是TensorFlow.js中的最重要的数据单元，它是一个形状为一维或多维数组组成的数值的集合。tf.Tensor和多维数组其实非常的相似。  
 
@@ -113,9 +113,26 @@ b.print();
  a.data().then(data => console.log(data));
 ```
 
-### 2.4. 变量Variable
+### 2.4. 变量Variable
 
+TensorFlow变量(Variable)的主要作用是维护特定节点的状态，如深度学习或机器学习的模型参数。  
+tf.Variable方法是操作，返回值是变量（特殊张量）。  
 
+通过tf.Variable方法创建的变量与张量一样，可以作为操作的输入和输出。不同在于：  
+
+- 张量的生命周期通常随依赖的计算完成而结束，内存也随即释放。
+- 变量则常驻内存，在每一步的训练时不断更新其值，以实现模型参数的更新。  
+
+```js
+const x = tf.variable(tf.tensor([1, 2, 3]));
+x.assign(tf.tensor([4, 5, 6]));
+
+x.print();
+```
+
+TensorFlow变量使用流程
+
+![变量](images/ts6.png)
 
 ### 2.5. 操作Operation
 
