@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Web端人脸采集</title>
+</head>
+
+<style>
+  #canvasImg{
+    display: none;
+  }
+</style>
+
+<body>
+  <div class="container">
+    <div class="wraper">
+      <p>人脸识别身份验证</p>
+      <p>【温馨提示：请保持光线充足，并正对摄像头】</p>
+      <video id="videoEl" autoplay muted></video>
+      <canvas id="trackBox"></canvas>
+    </div> 
+    <canvas id="canvasImg" ></canvas>
+  </div>
+</body>
+
+</html>
