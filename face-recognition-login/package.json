@@ -54,6 +54,7 @@
     "webpack-theme-color-replacer": "^1.3.14"
   },
   "dependencies": {
+    "face-api.js": "^0.22.2",
     "node-fetch": "^2.6.0"
   }
 }

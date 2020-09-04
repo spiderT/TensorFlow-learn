@@ -1,7 +1,5 @@
-require("./assets/styles/index.less");
-const faceapi = require("./assets/face-api/face-api.js");
-const bbt = require("./assets/face-api/js/bbt");
-const commons = require("./assets/face-api/js/commons");
+const faceapi = require("face-api.js");
+
 const errorMap = {
   NotAllowedError: "摄像头已被禁用，请在当前浏览器设置中开启后重试",
   AbortError: "硬件问题，导致无法访问摄像头",
@@ -16,10 +14,7 @@ class FaceDetection {
   constructor(options) {
     this.options = Object.assign({
         matchedScore: 0.7,
-        mediaSize: {
-          width: 540,
-          height: 325
-        }
+        matchedDistance: 0.5,
       },
       options
     );
@@ -27,39 +22,43 @@ class FaceDetection {
     this.timer = null;
     this.mediaStreamTrack = null; // 摄像头媒体流
     this.descriptors = {
-      desc1: null,
-      desc2: null
+      data1: null,
+      data2: null
     }; // 两种数据
 
     this.videoEl = document.querySelector("#videoEl"); // 视频区域
-    this.trackBoxEl = document.querySelector("#trackBox"); // 人脸框绘制区域
     this.canvasImgEl = document.querySelector("#canvasImg"); // 图片绘制区域
+    this.loadingEl = document.querySelector("#loading");
+    this.successEl = document.querySelector("#success");
+    this.errorEl = document.querySelector("#error");
 
     this.init();
   }
 
   async init() {
-    this.resize();
     await this.initDetection();
     this.loadFaceImage();
-  }
-
-  // 设置相关容器大小
-  resize() {
-    const tmp = [this.videoEl, this.canvasImgEl];
-    for (let i = 0; i < tmp.length; i++) {
-      tmp[i].width = this.options.mediaSize.width;
-      tmp[i].height = this.options.mediaSize.height;
-    }
-    const wraperEl = document.querySelector(".wraper");
-    wraperEl.style.width = `${this.options.mediaSize.width}px`;
-    wraperEl.style.height = `${this.options.mediaSize.height}px`;
   }
 
   // 初始化人脸识别
   async initDetection() {
     // 加载模型
-    await faceapi.loadTinyFaceDetectorModel("./assets/face-api/weights");
+    // ageGenderNet
+    // faceExpressionNet
+    // faceLandmark68Net
+    // faceLandmark68TinyNet
+    // faceRecognitionNet
+    // ssdMobilenetv1
+    // tinyFaceDetector
+    // tinyYolov2
+
+    await faceapi.nets.faceExpressionNet.loadFromUri('./assets/models')
+    await faceapi.nets.tinyFaceDetector.loadFromUri('./assets/models')
+    await faceapi.nets.ssdMobilenetv1.loadFromUri('./assets/models')
+    await faceapi.nets.faceLandmark68Net.loadFromUri('./assets/models')
+    await faceapi.nets.faceRecognitionNet.loadFromUri('./assets/models')
+
+
     const mediaOpt = {
       video: true
     };
@@ -109,10 +108,11 @@ class FaceDetection {
     // 判断人脸扫描结果
     if (faceDetectionTask) {
       if (faceDetectionTask.score > this.options.matchedScore) {
-        console.log(`检测到人脸，匹配度大于 ${this.options.matchedScore}`);
+        console.log(`检测到人脸，匹配度${faceDetectionTask.score }大于 ${this.options.matchedScore}`);
         // 人脸符合要求，暂停视频流
         this.videoEl.pause();
-        // TODO 调用后端接口进行身份验证
+        // 识别loading
+        this.loadingEl.style.display = 'block';
         this.canvasImgEl
           .getContext("2d")
           .drawImage(
@@ -124,7 +124,8 @@ class FaceDetection {
           );
         // 将绘制的图像转化成 图片的 base64 编码
         let image = this.canvasImgEl.toDataURL("image/png");
-        this.descriptors.desc2 = image;
+        this.descriptors.data2 = image;
+        // 进行身份验证
         this.recognitionFace();
       }
     }
@@ -134,41 +135,44 @@ class FaceDetection {
   recognitionFace() {
     const img1 = document.createElement("img");
     const img2 = document.createElement("img");
-    img1.src = this.descriptors.desc1;
-    img2.src = this.descriptors.desc2;
+    img1.src = this.descriptors.data1;
+    img2.src = this.descriptors.data2;
 
-    document.body.appendChild(img1);
-    document.body.appendChild(img2);
+    // document.body.appendChild(img1);
+    // document.body.appendChild(img2);
 
     setTimeout(async () => {
-      console.log("img1", img1, "img2", img2);
-      const desc1 = await faceapi.computeFaceDescriptor(img1);
-      // face-api.js:3558 Uncaught (in promise) Error: FaceRecognitionNet - load model before inference
-      // at FaceRecognitionNet../src/assets/face-api/face-api.js.FaceRecognitionNet.forwardInput (face-api.js:3558)
-      const desc2 = await faceapi.computeFaceDescriptor(img2);
-      console.log("desc1", desc1, "desc2", desc2);
+      const data1 = await faceapi.computeFaceDescriptor(img1);
+      const data2 = await faceapi.computeFaceDescriptor(img2);
 
-      // desc1 是Float32Array数据
-      // todo 报错
       const distance = faceapi.utils.round(
-        faceapi.euclideanDistance(desc1, desc2)
+        faceapi.euclideanDistance(data1, data2)
       );
 
-      Error: euclideanDistance: arr1.length !== arr2.length;
       console.log("distance", distance);
-    }, 3000);
+      this.loadingEl.style.display = 'none';
+      if (distance < this.options.matchedDistance) {
+        // 识别成功，识别loading消失，提示成功
+        this.successEl.style.display = 'block';
+      } else {
+        // 识别失败，识别loading消失，提示失败
+        this.errorEl.style.display = 'block';
+      }
+    }, 300);
   }
 
   loadFaceImage() {
-    let url = "./assets/images/11.jpg";
+    // 需要被验证一致的图
+    const url = "./assets/images/p1.png"; // 0.39
+
     this.convertImgToBase64(url, base64Img => {
       //转化后的base64
-      this.descriptors.desc1 = base64Img;
+      this.descriptors.data1 = base64Img;
     });
   }
 
   convertImgToBase64(url, callback) {
-    let canvas = document.createElement("CANVAS"),
+    const canvas = document.createElement("CANVAS"),
       ctx = canvas.getContext("2d"),
       img = new Image();
     img.crossOrigin = "Anonymous";
@@ -176,7 +180,7 @@ class FaceDetection {
       canvas.height = img.height;
       canvas.width = img.width;
       ctx.drawImage(img, 0, 0);
-      let dataURL = canvas.toDataURL("image/png");
+      const dataURL = canvas.toDataURL("image/png");
       callback.call(this, dataURL);
     };
     img.src = url;
