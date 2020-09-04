@@ -18,9 +18,9 @@
     height: 320px;
   }
 
-  .video{
+  .video {
     width: 100%;
-    height:100%;
+    height: 100%;
   }
 
   #canvasImg {
@@ -29,43 +29,46 @@
 
   .loading {
     display: none;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
     position: absolute;
     top: 50%;
     left: 50%;
-    margin-top: -54px;
-    margin-left: -54px;
-    height: 100px;
-    width: 100px;
-    line-height: 100px;
-    text-align: center;
+    margin-top: -60px;
+    margin-left: -60px;
     color: #fff;
-    border-radius: 100%;
     background-color: #389e0d;
-    opacity: 0.5;
-    animation-name: stretch;
-    animation-duration: 1s;
-    animation-direction: alternate;
-    animation-iteration-count: infinite;
+    border-radius: 100%;
+    animation: scaleout 1.0s infinite ease-in-out;
   }
 
-  @keyframes stretch {
+  @-webkit-keyframes scaleout {
     0% {
-      transform: scale(.5);
-      background-color: #389e0d;
-    }
-
-    50% {
-      transform: scale(1);
-      background-color: #73d13d;
+      -webkit-transform: scale(0.0)
     }
 
     100% {
-      transform: scale(1.5);
-      background-color: #b7eb8f;
+      -webkit-transform: scale(1.0);
+      opacity: 0;
     }
   }
 
-  .tips{
+  @keyframes scaleout {
+    0% {
+      transform: scale(0.0);
+      -webkit-transform: scale(0.0);
+    }
+
+    100% {
+      transform: scale(1.0);
+      -webkit-transform: scale(1.0);
+      opacity: 0;
+    }
+  }
+
+  .tips {
     display: none;
     background-color: rgba(0, 0, 0, 0.2);
     padding: 10px;
@@ -76,11 +79,11 @@
     transform: translate(-50%, -50%);
   }
 
-  .success{
+  .success {
     color: #389e0d;
   }
 
-  .error{
+  .error {
     color: #cf1322;
   }
 </style>
