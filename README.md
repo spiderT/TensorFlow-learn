@@ -45,8 +45,8 @@ TensorFlow数据流图是一种声明式编程范式
 
 TensorFlow数据流图优势：  
 
-- 并行计算快
-- 分布式计算快(CPUs, GPUs TPUs)
+- 并行计算快
+- 分布式计算快(CPUs, GPUs TPUs)
 - 预编译优化(XLA)
 - 可移植性好(Language-independent representation)
 
@@ -147,6 +147,7 @@ TensorFlow变量使用流程
 #### TensorFlow典型计算和控制操作
 
 | 操作类型 | 典型操作 |
+| ------ | ------ |
 | 基础算术 | add/multiply/mod/sqrt/sin/trace/fft/argmin |
 | 数组运算 | size/rank/split/reverse/cast/one_hot/quantize |
 | 梯度裁剪 | clip_by_value/clip_by_norm/clip_by_global_norm |
@@ -175,6 +176,7 @@ sess = tf.Session(target=...,graph=...,config=...)
 ```
 
 | 参数名称 | 功能说明 |
+| ------ | ------ |
 | target | 会话连接的执行引擎 |
 | graph | 会话加载的数据流图 |
 | config | 会话启动时的配置项 |
@@ -221,6 +223,7 @@ sess.close()
 TensorFlow内置优化器  
 
 | 优化器名称 | 文件路径 |
+| ------ | ------ |
 | Adadelta | tensorflow/python/training/adadelta.py |
 | Adagrad | tensorflow/python/training/adagrad.py |
 | Adagrad Dual Averaging | tensorflow/python/training/adagrad_da.py |
